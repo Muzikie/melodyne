@@ -1,0 +1,21 @@
+{
+  "name": "melodyne",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "The smart contract of Muzikie on Lisk L2",
+  "author": "Ali Haghighatkhah <ali@muzikie.com>",
+  "scripts": {
+    "deploy:testnet": "npx hardhat ignition deploy ignition/modules/Campaign.ts --network lisk-sepolia",
+    "deploy:mainnet": "npx hardhat ignition deploy ignition/modules/Campaign.ts --network lisk",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test"
+  },
+  "keywords": ["music", "blockchain", "fundraiser"],
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "dotenv": "^16.5.0",
+    "hardhat": "^2.24.0"
+  }
+}
