@@ -2,6 +2,12 @@
 
 A fundraising smart contract system for **Lisk L2 on Optimism**. Users can create campaigns with tiered contributions, hard caps, goals, and deadlines. Campaigns can succeed, fail, or sell out — and refunds or withdrawals are supported depending on the campaign outcome.
 
+
+- [Lisk Testnet deployment](https://sepolia-blockscout.lisk.com/address/0xE7aadAeBc5f2c5c3aE95F3dCE8AAb3e178D76432?tab=contract)
+- [Lisk Mainnet deployment]()
+
+
+
 ---
 
 ## 🚀 Features
