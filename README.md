@@ -1,4 +1,5 @@
-# 🎯 CampaignManager Smart Contract
+# Melodyne
+## The Smart Contract of Muzikie
 
 A fundraising smart contract system for **Lisk L2 on Optimism**. Users can create campaigns with tiered contributions, hard caps, goals, and deadlines. Campaigns can succeed, fail, or sell out — and refunds or withdrawals are supported depending on the campaign outcome.
 

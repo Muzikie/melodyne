@@ -1,4 +1,5 @@
 import type { HardhatUserConfig } from "hardhat/config";
+import "@nomiclabs/hardhat-ethers"
 import "@nomicfoundation/hardhat-toolbox-viem";
 import 'dotenv/config';
 

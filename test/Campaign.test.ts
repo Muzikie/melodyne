@@ -3,9 +3,26 @@ import { ethers } from "hardhat";
 import { Contract, Signer } from "ethers";
 
 describe("CampaignManager", function () {
+  let mockUSDC: Contract;
   let campaign: Contract;
   let owner: Signer, user1: Signer, user2: Signer;
   let ownerAddress: string;
+
+
+  beforeEach(async function () {
+    [owner, user1, user2] = await ethers.getSigners();
+
+    const MockUSDC = await ethers.getContractFactory("MockUSDC");
+    mockUSDC = await MockUSDC.deploy();
+    await mockUSDC.deployed();
+
+    const CampaignManager = await ethers.getContractFactory("CampaignManager");
+    campaign = await CampaignManager.deploy(mockUSDC.address); // constructor injection
+    await campaign.deployed();
+
+    // Fund users
+    await mockUSDC.transfer(await user1.getAddress(), ethers.utils.parseUnits("1000", 6));
+  });
 
   beforeEach(async function () {
     [owner, user1, user2] = await ethers.getSigners();
