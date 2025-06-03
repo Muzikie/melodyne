@@ -166,4 +166,9 @@ contract Melodyne {
         require(_tierIndex < c.tiers.length, "Invalid index");
         return c.tiers[_tierIndex].amount;
     }
+
+    function getContribution(uint256 _id, address _user) external view returns (uint256) {
+        Campaign storage c = campaigns[_id];
+        return c.contributions[_user];
+    }
 }
