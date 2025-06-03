@@ -1,8 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract CampaignManager {
+contract Melodyne {
+    IERC20 public immutable usdc;
     enum CampaignStatus { Draft, Published, Successful, Failed, SoldOut }
+
+    constructor(address _usdcAddress) {
+        usdc = IERC20(_usdcAddress);
+    }
 
     struct Tier {
         uint256 amount;
@@ -70,7 +76,7 @@ contract CampaignManager {
         emit CampaignPublished(_id);
     }
 
-    function contribute(uint256 _id, uint256 _tierIndex) external payable {
+    function contribute(uint256 _id, uint256 _tierIndex) external {
         Campaign storage c = campaigns[_id];
         require(c.status != CampaignStatus.Draft, "Not published yet");
         require(c.status != CampaignStatus.SoldOut, "Already sold out");
@@ -79,7 +85,9 @@ contract CampaignManager {
         require(_tierIndex < c.tiers.length, "Invalid tier");
 
         uint256 amount = c.tiers[_tierIndex].amount;
-        require(msg.value == amount, "Incorrect ETH sent");
+
+        // Transfer USDC from contributor to contract
+        require(usdc.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         c.totalContributed += amount;
         c.contributions[msg.sender] += amount;
@@ -108,13 +116,14 @@ contract CampaignManager {
             c.status == CampaignStatus.Failed || (c.status == CampaignStatus.Published && c.deadline <= block.timestamp),
             "Not refundable"
         );
+        _updateStatus(_id);
         uint256 amount = c.contributions[msg.sender];
         require(amount > 0, "No contribution");
         c.contributions[msg.sender] = 0;
-        payable(msg.sender).transfer(amount);
-        emit Refunded(_id, msg.sender, amount);
+        c.totalContributed -= amount;
+        require(usdc.transfer(msg.sender, amount), "Refund failed");
 
-        _updateStatus(_id);
+        emit Refunded(_id, msg.sender, amount);
     }
 
     function withdraw(uint256 _id) external onlyOwner(_id) {
@@ -123,7 +132,8 @@ contract CampaignManager {
         require(!c.ownerWithdrawn, "Already withdrawn");
 
         c.ownerWithdrawn = true;
-        payable(c.owner).transfer(c.totalContributed);
+        require(usdc.transfer(c.owner, c.totalContributed), "Withdraw failed");
+
         emit OwnerWithdrawn(_id);
     }
 
@@ -155,5 +165,10 @@ contract CampaignManager {
         Campaign storage c = campaigns[_id];
         require(_tierIndex < c.tiers.length, "Invalid index");
         return c.tiers[_tierIndex].amount;
+    }
+
+    function getContribution(uint256 _id, address _user) external view returns (uint256) {
+        Campaign storage c = campaigns[_id];
+        return c.contributions[_user];
     }
 }
