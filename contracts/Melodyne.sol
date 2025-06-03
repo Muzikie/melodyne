@@ -116,14 +116,14 @@ contract Melodyne {
             c.status == CampaignStatus.Failed || (c.status == CampaignStatus.Published && c.deadline <= block.timestamp),
             "Not refundable"
         );
+        _updateStatus(_id);
         uint256 amount = c.contributions[msg.sender];
         require(amount > 0, "No contribution");
         c.contributions[msg.sender] = 0;
+        c.totalContributed -= amount;
         require(usdc.transfer(msg.sender, amount), "Refund failed");
 
         emit Refunded(_id, msg.sender, amount);
-
-        _updateStatus(_id);
     }
 
     function withdraw(uint256 _id) external onlyOwner(_id) {
