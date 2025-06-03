@@ -719,6 +719,36 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nomicfoundation/hardhat-chai-matchers@npm:^2.0.8":
+  version: 2.0.8
+  resolution: "@nomicfoundation/hardhat-chai-matchers@npm:2.0.8"
+  dependencies:
+    "@types/chai-as-promised": ^7.1.3
+    chai-as-promised: ^7.1.1
+    deep-eql: ^4.0.1
+    ordinal: ^1.0.3
+  peerDependencies:
+    "@nomicfoundation/hardhat-ethers": ^3.0.0
+    chai: ^4.2.0
+    ethers: ^6.1.0
+    hardhat: ^2.9.4
+  checksum: bcf2efcf98e1e889e4566b3ff23099313c67a4c765367f702672890e0d3e6f38ad8de415ee6e9f65d038f6dcd879cc080ca0dda07109acc7d3fc249e8fdb79f5
+  languageName: node
+  linkType: hard
+
+"@nomicfoundation/hardhat-ethers@npm:^3.0.0":
+  version: 3.0.8
+  resolution: "@nomicfoundation/hardhat-ethers@npm:3.0.8"
+  dependencies:
+    debug: ^4.1.1
+    lodash.isequal: ^4.5.0
+  peerDependencies:
+    ethers: ^6.1.0
+    hardhat: ^2.0.0
+  checksum: 6ad6da6713fa25e653cef894ec10762fc3d728a50461a63c169eac248b5b1ea81bb3d42e8017601bbd231c9fee034336e1f2dc25375d5dcf9926ec4d4389034a
+  languageName: node
+  linkType: hard
+
 "@nomicfoundation/hardhat-ignition-viem@npm:^0.15.0":
   version: 0.15.11
   resolution: "@nomicfoundation/hardhat-ignition-viem@npm:0.15.11"
@@ -1205,7 +1235,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai-as-promised@npm:^7.1.6":
+"@types/chai-as-promised@npm:^7.1.3, @types/chai-as-promised@npm:^7.1.6":
   version: 7.1.8
   resolution: "@types/chai-as-promised@npm:7.1.8"
   dependencies:
@@ -2214,7 +2244,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"deep-eql@npm:^4.1.3":
+"deep-eql@npm:^4.0.1, deep-eql@npm:^4.1.3":
   version: 4.1.4
   resolution: "deep-eql@npm:4.1.4"
   dependencies:
@@ -3683,6 +3713,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.isequal@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.isequal@npm:4.5.0"
+  checksum: da27515dc5230eb1140ba65ff8de3613649620e8656b19a6270afe4866b7bd461d9ba2ac8a48dcc57f7adac4ee80e1de9f965d89d4d81a0ad52bb3eec2609644
+  languageName: node
+  linkType: hard
+
 "lodash.memoize@npm:^4.1.2":
   version: 4.1.2
   resolution: "lodash.memoize@npm:4.1.2"
@@ -3792,6 +3829,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "melodyne@workspace:."
   dependencies:
+    "@nomicfoundation/hardhat-chai-matchers": ^2.0.8
+    "@nomicfoundation/hardhat-ethers": ^3.0.0
     "@nomicfoundation/hardhat-ignition": ^0.15.11
     "@nomicfoundation/hardhat-ignition-viem": ^0.15.0
     "@nomicfoundation/hardhat-network-helpers": ^1.0.0
@@ -3808,6 +3847,7 @@ __metadata:
     "@types/node": ^22.15.29
     chai: ^4.2.0
     dotenv: ^16.5.0
+    ethers: ^5.7.2
     hardhat: ^2.24.1
     hardhat-gas-reporter: ^1.0.8
     solidity-coverage: ^0.8.1
@@ -4249,6 +4289,13 @@ __metadata:
     type-check: ~0.3.2
     word-wrap: ~1.2.3
   checksum: b8695ddf3d593203e25ab0900e265d860038486c943ff8b774f596a310f8ceebdb30c6832407a8198ba3ec9debe1abe1f51d4aad94843612db3b76d690c61d34
+  languageName: node
+  linkType: hard
+
+"ordinal@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "ordinal@npm:1.0.3"
+  checksum: 6761c5b7606b6c4b0c22b4097dab4fe7ffcddacc49238eedf9c0ced877f5d4e4ad3f4fd43fefa1cc3f167cc54c7149267441b2ae85b81ccf13f45cf4b7947164
   languageName: node
   linkType: hard
 
@@ -5582,8 +5629,8 @@ __metadata:
   linkType: hard
 
 "viem@npm:^2.7.6":
-  version: 2.30.5
-  resolution: "viem@npm:2.30.5"
+  version: 2.30.6
+  resolution: "viem@npm:2.30.6"
   dependencies:
     "@noble/curves": 1.9.1
     "@noble/hashes": 1.8.0
@@ -5598,7 +5645,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 0aa2df4d717103c4d0858860b74f163765ee27da4da70915cc23bdb5e0f9759902f342c125c6467d2740095769e02e326f9df580b0b4f6203fbf75cb56537e33
+  checksum: 8732bd05bd730cfe4bf34c0e740967c27f073482fadf42eccc539ee65a50a7ac9a3b1c5efaf590cdcb868eb8d09dc96def04dc776825e845eb18ba83ac2930d5
   languageName: node
   linkType: hard
 

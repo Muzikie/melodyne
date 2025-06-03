@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract CampaignManager {
+contract Melodyne {
     IERC20 public immutable usdc;
     enum CampaignStatus { Draft, Published, Successful, Failed, SoldOut }
 

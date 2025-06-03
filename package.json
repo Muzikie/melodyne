@@ -5,8 +5,9 @@
   "description": "The smart contract of Muzikie on Lisk L2",
   "author": "Ali Haghighatkhah <ali@muzikie.com>",
   "scripts": {
-    "deploy:testnet": "npx hardhat ignition deploy ignition/modules/Campaign.ts --network lisk-sepolia",
-    "deploy:mainnet": "npx hardhat ignition deploy ignition/modules/Campaign.ts --network lisk",
+    "deploy:melodyne:testnet": "npx hardhat ignition deploy ignition/modules/Melodyne.ts --network lisk-sepolia",
+    "deploy:melodyne:mainnet": "npx hardhat ignition deploy ignition/modules/Melodyne.ts --network lisk",
+    "deploy:usdc:testnet": "npx hardhat ignition deploy ignition/modules/MockUSDC.ts --network lisk-sepolia",
     "compile": "npx hardhat compile",
     "test": "npx hardhat test"
   },
@@ -17,6 +18,8 @@
   ],
   "license": "ISC",
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-ignition": "^0.15.11",
     "@nomicfoundation/hardhat-ignition-viem": "^0.15.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
@@ -40,7 +43,8 @@
     "viem": "^2.7.6"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.3.0"
+    "@openzeppelin/contracts": "^5.3.0",
+    "ethers": "^5.7.2"
   },
   "packageManager": "yarn@3.2.3+sha512.f26f951f67de0c6a33ee381e5ff364709c87e70eb5e65c694e4facde3512f1fa80b8679e6ba31ce7d340fbb46f08dd683af9457e240f25a204be7427940d767e"
 }
