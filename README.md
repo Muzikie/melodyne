@@ -72,9 +72,10 @@ hardhat.config.ts             # Hardhat config
 
 ## 🧱 Addresses
 - Lisk Sepolia
+  - Deployer Account: `0xEB32c9fc9c5553f698C95AC5bA218fD70843fD53`
   - USDC: `0x3ba742FD7502a6395D234e024A64c78705496dfE`
-  - CampaignManager: `0xE7aadAeBc5f2c5c3aE95F3dCE8AAb3e178D76432`
-  - Melodyne: ``
+  - Melodyne: `0xEB32c9fc9c5553f698C95AC5bA218fD70843fD53`
+  - MelodyneV2: `0xf915887e441AA771f88d454A1C0A063cC1D2B01C`
 - Lisk Mainnet
   - Melodyne: ``
 

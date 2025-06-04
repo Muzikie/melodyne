@@ -2,7 +2,7 @@
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Melodyne {
+contract MelodyneV2 {
     IERC20 public immutable usdc;
     enum CampaignStatus { Draft, Published, Successful, Failed, SoldOut }
 
@@ -101,12 +101,10 @@ contract Melodyne {
 
         if (c.totalContributed >= c.hardCap) {
             c.status = CampaignStatus.SoldOut;
+        } else if (c.totalContributed >= c.goal) {
+            c.status = CampaignStatus.Successful;
         } else if (block.timestamp >= c.deadline) {
-            if (c.totalContributed >= c.goal) {
-                c.status = CampaignStatus.Successful;
-            } else {
-                c.status = CampaignStatus.Failed;
-            }
+            c.status = CampaignStatus.Failed;
         }
     }
 

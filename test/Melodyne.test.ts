@@ -12,7 +12,7 @@ describe('Melodyne Fundraiser', function () {
     usdc = await MockUSDC.deploy();
     await usdc.deployed();
 
-    const Melodyne = await ethers.getContractFactory('Melodyne');
+    const Melodyne = await ethers.getContractFactory('MelodyneV2');
     melodyne = await Melodyne.deploy(usdc.address);
     await melodyne.deployed();
 
@@ -173,9 +173,6 @@ describe('Melodyne Fundraiser', function () {
       await ethers.provider.send('evm_increaseTime', [3700]);
       await ethers.provider.send('evm_mine', []);
 
-      await melodyne.connect(donor1).refund(0); // triggers _updateStatus()
-      await melodyne.connect(owner).getCampaign(0);
-      
       const campaign = await melodyne.getCampaign(0);
       expect(campaign.status).to.equal(2); // Successful
     });
@@ -230,7 +227,6 @@ describe('Melodyne Fundraiser', function () {
       await ethers.provider.send('evm_increaseTime', [3700]);
       await ethers.provider.send('evm_mine', []);
 
-      await melodyne.connect(donor1).refund(0); // triggers status update to Successful
 
       await expect(melodyne.connect(owner).withdraw(0))
         .to.emit(melodyne, 'OwnerWithdrawn')
