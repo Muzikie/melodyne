@@ -1,13 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "./interfaces/IMelodyneConfig.sol";
 
 contract MelodyneV2 {
     IERC20 public immutable usdc;
+    IMelodyneConfig public immutable config;
     enum CampaignStatus { Draft, Published, Successful, Failed, SoldOut }
 
-    constructor(address _usdcAddress) {
+    constructor(address _usdcAddress, address _configAddress) {
         usdc = IERC20(_usdcAddress);
+        config = IMelodyneConfig(_configAddress);
     }
 
     struct Tier {
@@ -28,6 +31,7 @@ contract MelodyneV2 {
 
     uint256 public campaignCount;
     mapping(uint256 => Campaign) private campaigns;
+    mapping(address => uint256) public activeCampaigns;
 
     event CampaignCreated(uint256 indexed id, address indexed owner);
     event CampaignPublished(uint256 indexed id);
@@ -46,9 +50,29 @@ contract MelodyneV2 {
         _;
     }
 
-    function createCampaign(uint256 _goal, uint256 _hardCap, uint256 _deadline) external {
+    modifier notPaused() {
+        require(!config.isPaused(), "Platform is paused");
+        _;
+    }
+
+    function createCampaign(uint256 _goal, uint256 _hardCap, uint256 _deadline) external notPaused() {
+        // Campaign rules
         require(_goal <= _hardCap, "Goal exceeds cap");
         require(_deadline > block.timestamp, "Invalid deadline");
+        uint256 duration = _deadline - block.timestamp;
+        require(duration >= config.minCampaignDuration(), "Below min duration");
+        require(duration <= config.maxCampaignDuration(), "Above max duration");
+
+        // Platform-wide constraints
+        require(activeCampaigns[msg.sender] < config.maxActiveCampaignsPerUser(), "Too many active");
+
+        // Pay campaign creation fee
+        uint256 creationFee = config.campaignCreationFee();
+        if (creationFee > 0) {
+            IERC20 feeToken = IERC20(config.campaignFeeToken());
+            require(feeToken.transferFrom(msg.sender, config.feeRecipient(), creationFee), "Fee payment failed");
+        }
+
 
         Campaign storage c = campaigns[campaignCount];
         c.owner = msg.sender;
@@ -57,6 +81,7 @@ contract MelodyneV2 {
         c.deadline = _deadline;
         c.status = CampaignStatus.Draft;
 
+        activeCampaigns[msg.sender]++;
         emit CampaignCreated(campaignCount, msg.sender);
         campaignCount++;
     }
@@ -69,14 +94,14 @@ contract MelodyneV2 {
         emit TierAdded(_id, _amount);
     }
 
-    function publishCampaign(uint256 _id) external onlyOwner(_id) isDraft(_id) {
+    function publishCampaign(uint256 _id) external onlyOwner(_id) isDraft(_id) notPaused() {
         Campaign storage c = campaigns[_id];
         require(c.tiers.length > 0, "At least one tier required");
         c.status = CampaignStatus.Published;
         emit CampaignPublished(_id);
     }
 
-    function contribute(uint256 _id, uint256 _tierIndex) external {
+    function contribute(uint256 _id, uint256 _tierIndex) external notPaused() {
         Campaign storage c = campaigns[_id];
         require(c.status != CampaignStatus.Draft, "Not published yet");
         require(c.status != CampaignStatus.SoldOut, "Already sold out");
@@ -98,6 +123,7 @@ contract MelodyneV2 {
 
     function _updateStatus(uint256 _id) internal {
         Campaign storage c = campaigns[_id];
+        CampaignStatus oldStatus = c.status;
 
         if (c.totalContributed >= c.hardCap) {
             c.status = CampaignStatus.SoldOut;
@@ -105,6 +131,13 @@ contract MelodyneV2 {
             c.status = CampaignStatus.Successful;
         } else if (block.timestamp >= c.deadline) {
             c.status = CampaignStatus.Failed;
+        }
+
+        if (
+            (oldStatus == CampaignStatus.Published || oldStatus == CampaignStatus.Draft) &&
+            (c.status == CampaignStatus.SoldOut || c.status == CampaignStatus.Successful || c.status == CampaignStatus.Failed)
+        ) {
+            activeCampaigns[c.owner]--;
         }
     }
 
@@ -124,14 +157,28 @@ contract MelodyneV2 {
         emit Refunded(_id, msg.sender, amount);
     }
 
-    function withdraw(uint256 _id) external onlyOwner(_id) {
+    function withdraw(uint256 _id) external onlyOwner(_id) notPaused() {
         Campaign storage c = campaigns[_id];
         require(c.status == CampaignStatus.Successful || c.status == CampaignStatus.SoldOut, "Not allowed");
         require(!c.ownerWithdrawn, "Already withdrawn");
 
-        c.ownerWithdrawn = true;
-        require(usdc.transfer(c.owner, c.totalContributed), "Withdraw failed");
+        uint256 total = c.totalContributed;
+        uint256 feeBps = config.platformFeeBps();
+        address recipient = config.feeRecipient();
+        uint256 fee = (total * feeBps) / 10_000;
+        uint256 payout = total - fee;
 
+        if (fee > 0) {
+            require(
+                usdc.transfer(recipient, fee) &&
+                usdc.transfer(c.owner, payout),
+                "Transfer failed"
+            );
+        } else {
+            require(usdc.transfer(c.owner, payout), "Payout failed");
+        }
+
+        c.ownerWithdrawn = true;
         emit OwnerWithdrawn(_id);
     }
 

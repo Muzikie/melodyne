@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { ethers } from 'hardhat';
 
 describe('Melodyne Fundraiser', function () {
-  let usdc, melodyne;
+  let usdc, melodyne, config;
   let owner, donor1, donor2;
 
   beforeEach(async () => {
@@ -12,8 +12,21 @@ describe('Melodyne Fundraiser', function () {
     usdc = await MockUSDC.deploy();
     await usdc.deployed();
 
+    const MelodyneConfig = await ethers.getContractFactory('MelodyneConfig');
+    config = await MelodyneConfig.deploy();
+    await config.deployed();
+
+    await config.setPlatformFeeBps(500); // 5%
+    await config.setFeeRecipient(owner.address);
+    await config.setCampaignDurations(60, 30 * 24 * 60 * 60); // 1 min to 30 days
+    await config.setMaxActiveCampaignsPerUser(3);
+    await config.setAllowedToken(usdc.address, true);
+    await config.togglePause(false);
+    await config.setCampaignCreationFee(0);
+    await config.setCampaignFeeToken(usdc.address); // Use USDC for simplicity
+
     const Melodyne = await ethers.getContractFactory('MelodyneV2');
-    melodyne = await Melodyne.deploy(usdc.address);
+    melodyne = await Melodyne.deploy(usdc.address, config.address);
     await melodyne.deployed();
 
     const amount = ethers.utils.parseUnits('1000', 6);
@@ -53,6 +66,104 @@ describe('Melodyne Fundraiser', function () {
         await melodyne.connect(owner).createCampaign(goal, cap, deadline);
       } catch (e) {
         expect(e.message).to.include('Invalid deadline');
+      }
+    });
+
+    it('Should revert if platform is paused', async () => {
+      await config.togglePause(true);
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+      const deadline = (await ethers.provider.getBlock('latest')).timestamp + 3600;
+
+      try {
+        await melodyne.connect(owner).createCampaign(goal, cap, deadline);
+      } catch (e) {
+        expect(e.message).to.include("Platform is paused");
+      }
+    });
+
+    it('Should revert if duration is below minimum', async () => {
+      await config.setCampaignDurations(3600, 36000); // 1 hour
+      const now = (await ethers.provider.getBlock('latest')).timestamp;
+      const deadline = now + 300; // 5 min
+
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+
+      try {
+        await melodyne.createCampaign(goal, cap, deadline);
+      } catch (e) {
+        expect(e.message).to.include("Below min duration");
+      }
+    });
+
+    it('Should revert if duration is above maximum', async () => {
+      await config.setCampaignDurations(360, 3600); // 1 hour
+      const now = (await ethers.provider.getBlock('latest')).timestamp;
+      const deadline = now + 86400; // 1 day
+
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+
+      try {
+        await melodyne.createCampaign(goal, cap, deadline)
+      } catch (e) {
+        expect(e.message).to.include("Above max duration");
+      }
+    });
+
+    it('Should revert if creation fee required but not approved', async () => {
+      await config.setCampaignCreationFee(ethers.utils.parseUnits('5', 6));
+      await config.setCampaignFeeToken(usdc.address);
+      await config.setFeeRecipient(owner.address); // any valid address
+
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+      const deadline = (await ethers.provider.getBlock('latest')).timestamp + 3600;
+
+      try {
+        await melodyne.createCampaign(goal, cap, deadline)
+      } catch (e) {
+        expect(e.message).to.include("ERC20InsufficientAllowance");
+      }
+    });
+
+    it('Should succeed if creation fee approved and transferred', async () => {
+      const fee = ethers.utils.parseUnits('5', 6);
+      await config.setCampaignCreationFee(fee);
+      await config.setCampaignFeeToken(usdc.address);
+      await config.setFeeRecipient(owner.address);
+
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+      const deadline = (await ethers.provider.getBlock('latest')).timestamp + 3600;
+
+      await usdc.connect(donor1).approve(melodyne.address, fee);
+
+      const balanceBefore = await usdc.balanceOf(owner.address);
+
+      await melodyne.connect(donor1).createCampaign(goal, cap, deadline);
+
+      const balanceAfter = await usdc.balanceOf(owner.address);
+      const diff = await balanceAfter.sub(balanceBefore)
+      expect(diff.toString()).to.equal(fee.toString());
+    });
+
+    it('Should revert if user exceeds max active campaigns', async () => {
+      await config.setMaxActiveCampaignsPerUser(1);
+      const now = (await ethers.provider.getBlock('latest')).timestamp;
+      const goal = ethers.utils.parseUnits('10', 6);
+      const cap = ethers.utils.parseUnits('20', 6);
+      const deadline = now + 3600;
+
+      // First campaign
+      await melodyne.createCampaign(goal, cap, deadline);
+
+      // Second campaign attempt should fail
+      try {
+        await melodyne.createCampaign(goal, cap, deadline)
+      } catch (e) {
+        expect(e.message).to.include("Too many active");
       }
     });
   });
