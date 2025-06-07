@@ -4,7 +4,7 @@ const { ethers } = require("hardhat");
 // npx hardhat run scripts/MelodyneConfigInteractions.js --network lisk-sepolia
 async function main() {
   const [deployer] = await ethers.getSigners();
-  const ONE_MIN = 60;
+  const ONE_HOUR = 60 * 60; // 1 hour
 
 
   /************  Deploy Config  **************/
@@ -17,7 +17,7 @@ async function main() {
 
 
   /************  Use Existing Config  **************/
-  const configAddress = "0x931dDf48fBa04054E49b1BF01977DDa887404Dfa";
+  const configAddress = "0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd";
   console.log("Connect with address:", configAddress);
   const MelodyneConfig = await ethers.getContractFactory("MelodyneConfig");
   const config = MelodyneConfig.attach(configAddress);
@@ -29,12 +29,12 @@ async function main() {
 
 
   console.log("Set Fee Recipient");
-  const tx2 = await config.setFeeRecipient(deployer.address);
+  const tx2 = await config.setFeeRecipient("0x808646080c7e494272CC8B3a1D02937E29E95B5A");
   await tx2.wait();
 
 
   console.log("Set Min and Max ranges");
-  const tx3 = await config.setCampaignDurations(ONE_MIN, ONE_MIN * 60 * 24 * 10); // 1 min, 10 days
+  const tx3 = await config.setCampaignDurations(ONE_HOUR, ONE_HOUR * 24 * 30); // 1 hour, 30 days
   await tx3.wait();
 
 
@@ -58,8 +58,8 @@ async function main() {
   console.log("🧾 Current MelodyneConfig:");
   console.log("• Platform Fee (bps):", feeBps.toString());
   console.log("• Fee Recipient:", feeRecipient);
-  console.log("• Min Duration (s):", minDuration.toString());
-  console.log("• Max Duration (s):", maxDuration.toString());
+  console.log("• Min Duration (s):", minDuration.toNumber());
+  console.log("• Max Duration (s):", maxDuration.toNumber());
   console.log("• Campaign Creation Fee:", creationFee.toString());
 
   console.log("🧩 Configuration complete!");

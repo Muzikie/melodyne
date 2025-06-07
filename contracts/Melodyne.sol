@@ -25,13 +25,13 @@ contract MelodyneV3 {
         CampaignStatus status;
         uint256 totalContributed;
         Tier[] tiers;
-        mapping(address => uint256) contributions;
         bool ownerWithdrawn;
     }
 
     uint256 public campaignCount;
     mapping(uint256 => Campaign) private campaigns;
     mapping(address => uint256) public activeCampaigns;
+    mapping(uint256 => mapping(address => uint256)) private contributions;
 
     event CampaignCreated(uint256 indexed id, address indexed owner);
     event CampaignPublished(uint256 indexed id);
@@ -115,7 +115,7 @@ contract MelodyneV3 {
         require(usdc.transferFrom(msg.sender, address(this), amount), "Transfer failed");
 
         c.totalContributed += amount;
-        c.contributions[msg.sender] += amount;
+        contributions[_id][msg.sender] += amount;
         emit Contributed(_id, msg.sender, amount);
 
         _updateStatus(_id);
@@ -148,9 +148,9 @@ contract MelodyneV3 {
             "Not refundable"
         );
         _updateStatus(_id);
-        uint256 amount = c.contributions[msg.sender];
+        uint256 amount = contributions[_id][msg.sender];
         require(amount > 0, "No contribution");
-        c.contributions[msg.sender] = 0;
+        contributions[_id][msg.sender] = 0;
         c.totalContributed -= amount;
         require(usdc.transfer(msg.sender, amount), "Refund failed");
 
@@ -213,7 +213,6 @@ contract MelodyneV3 {
     }
 
     function getContribution(uint256 _id, address _user) external view returns (uint256) {
-        Campaign storage c = campaigns[_id];
-        return c.contributions[_user];
+        return contributions[_id][_user];
     }
 }
