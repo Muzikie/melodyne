@@ -25,7 +25,7 @@ describe('Melodyne Fundraiser', function () {
     await config.setCampaignCreationFee(0);
     await config.setCampaignFeeToken(usdc.address); // Use USDC for simplicity
 
-    const Melodyne = await ethers.getContractFactory('MelodyneV2');
+    const Melodyne = await ethers.getContractFactory('MelodyneV3');
     melodyne = await Melodyne.deploy(usdc.address, config.address);
     await melodyne.deployed();
 
