@@ -10,7 +10,7 @@ async function main() {
   const donor1 = new Wallet("9e5f4c8fb95d93cde24a23d09a1d98b5f42b25ef191fa1fe157cd1edc13340d5", ethers.provider);
 
   const usdc = await ethers.getContractAt("MockUSDC", USDC_ADDRESS);
-  const melodyne = await ethers.getContractAt("MelodyneV2", MELODYNE_ADDRESS);
+  const melodyne = await ethers.getContractAt("MelodyneV3", MELODYNE_ADDRESS);
   const eth50 = ethers.utils.parseUnits("50", 6)
   const eth100 = ethers.utils.parseUnits("100", 6)
   const eth150 = ethers.utils.parseUnits("150", 6)

@@ -76,6 +76,7 @@ hardhat.config.ts             # Hardhat config
   - USDC: `0x3ba742FD7502a6395D234e024A64c78705496dfE`
   - Melodyne: `0xEB32c9fc9c5553f698C95AC5bA218fD70843fD53`
   - MelodyneV2: `0xf915887e441AA771f88d454A1C0A063cC1D2B01C`
+  - MelodyneV3: `0xE31BbEA583ABF2Ca939205f81989A3774bB8BBE3`
   - MelodyneConfig: `0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd`
 - Lisk Mainnet
   - Melodyne: ``
