@@ -89,6 +89,9 @@ Remeber to pass the network value.
   - MelodyneConfig: `0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd`,
   - Melodyne: `0x04028B70b21D30739922f6829FdDae61698aC78b`,
 - Lisk Mainnet
+  - Deployer Account: `0xEB32c9fc9c5553f698C95AC5bA218fD70843fD53`
+  - USDC: `0xF242275d3a6527d877f2c927a82D9b057609cc71`,
+  - MelodyneConfig: `0x6DB9c8f51D1a6494acB60D7e84870aeE4baa6d69`,
   - Melodyne: ``
 
 ## 📄 License
