@@ -1,4 +1,8 @@
 const { ethers } = require("hardhat");
+const deployments = require("../deploy-config.json");
+
+const NETWORK = process.env.NETWORK || "lisk";
+const CONFIG_ADDRESS = deployments[NETWORK].MelodyneConfig;
 
 // To test the interactions use
 // npx hardhat run scripts/MelodyneConfigInteractions.js --network lisk-sepolia
@@ -17,10 +21,9 @@ async function main() {
 
 
   /************  Use Existing Config  **************/
-  const configAddress = "0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd";
-  console.log("Connect with address:", configAddress);
+  console.log("Connect with address:", CONFIG_ADDRESS);
   const MelodyneConfig = await ethers.getContractFactory("MelodyneConfig");
-  const config = MelodyneConfig.attach(configAddress);
+  const config = MelodyneConfig.attach(CONFIG_ADDRESS);
 
 
   console.log("Set Fee BpS");

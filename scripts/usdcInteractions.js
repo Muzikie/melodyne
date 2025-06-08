@@ -1,14 +1,16 @@
 const { ethers } = require("hardhat");
+const deployments = require("../deploy-config.json");
+
+const NETWORK = process.env.NETWORK || "lisk";
+const MELODYNE_ADDRESS = deployments[NETWORK].Melodyne;
+const USDC_ADDRESS = deployments[NETWORK].USDC;
 
 // To test the interactions use
 // npx hardhat run scripts/usdcInteractions.js --network lisk-sepolia
 async function main() {
-  // Replace with your contract address
-  const contractAddress = "0x3ba742FD7502a6395D234e024A64c78705496dfE";
-
   // Attach to the deployed contract
   const MockUSDC = await ethers.getContractFactory("MockUSDC");
-  const mockUSDC = MockUSDC.attach(contractAddress);
+  const mockUSDC = MockUSDC.attach(USDC_ADDRESS);
 
   // Example: Check the contract name
   const name = await mockUSDC.name();
