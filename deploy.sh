@@ -43,7 +43,13 @@ fi
 
 # === Create new ignition module ===
 echo "🚀 Creating Ignition module: $MODULE_FILE"
-VAR_NAME=$(echo "$CONTRACT_NAME" | tr '[:upper:]' '[:lower:]')
+VAR_NAME=$(echo "${CONTRACT_NAME:0:1}" | tr '[:upper:]' '[:lower:]')${CONTRACT_NAME:1}
+ARGS_LINE=""
+if [[ "$CONTRACT_NAME" == "Melodyne" ]]; then
+  ARGS_LINE="[USDC_ADDRESS, CONFIG_ADDRESS]"
+else
+  ARGS_LINE=""
+fi
 
 cat > "$MODULE_FILE" <<EOF
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
@@ -54,7 +60,7 @@ const USDC_ADDRESS = deployments[NETWORK].USDC;
 const CONFIG_ADDRESS = deployments[NETWORK].MelodyneConfig;
 
 export default buildModule("${MODULE_NAME}", (m) => {
-  const ${VAR_NAME} = m.contract("${CONTRACT_NAME}", [USDC_ADDRESS, CONFIG_ADDRESS]);
+  const ${VAR_NAME} = m.contract("${CONTRACT_NAME}"${ARGS_LINE:+, $ARGS_LINE});
   return { ${VAR_NAME} };
 });
 EOF
@@ -89,8 +95,12 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 
 # Add or update the entry in JSON
-jq --arg net "$NETWORK" --arg ver "$VERSION" --arg addr "$DEPLOYED_ADDRESS" '
-  .[$net] = (.[$net] // {}) + { ("MelodyneV"+$ver): $addr }
+jq --arg net "$NETWORK" \
+   --arg addr "$DEPLOYED_ADDRESS" \
+   --arg ver "V${VERSION_NUMBER}" '
+  .[$net] = (.[$net] // {})
+    + { ("Melodyne" + $ver): $addr }
+    + { "Melodyne": $addr }
 ' "$CONFIG_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$CONFIG_FILE"
 
 echo "✅ Updated $CONFIG_FILE"

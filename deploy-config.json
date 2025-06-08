@@ -7,7 +7,6 @@
   "lisk-sepolia": {
     "USDC": "0x3ba742FD7502a6395D234e024A64c78705496dfE",
     "MelodyneConfig": "0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd",
-    "Melodyne": "0x02d8a9d9d09c071C43CEBaa52C7Fa9b0cBD5f18D",
-    "MelodyneVV13": "0xc372BbC62Fa1BdD334a9eE2448bD5C6C0D088d39"
+    "Melodyne": "0xc372BbC62Fa1BdD334a9eE2448bD5C6C0D088d39"
   }
 }
