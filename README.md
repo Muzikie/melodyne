@@ -52,21 +52,33 @@ yarn test
 
 ---
 
-## 📂 Project Structure
+## ✅ Deploy
+Use the `./deploy.sh` file to automatically deploy a new version of each contract. The bash script will
+ - Update all required files,
+ - Create new ignition module file,
+ - Compile the changed files
+ - Deploy the new version
+ - Commit, tag and push the changes.
+For example you can run:
+
 ```
-contracts/
-│   Melodyne.sol               # Main contract
-│   MockUSDC.sol               # Mock USDC to use on Sepolia
-ignition/modules/
-│   Melodyne.ts               # Deployment module
-│   MockUSDC.ts               # USDC token module
-test/
-│   usdcInteractions.ts       # TS scripts to interact with USDC for testing purposes
-test/
-│   Campaign.ts               # Tests for contract logic
-│   MockUSDC.test.ts          # Tests for USDC contract logic
-hardhat.config.ts             # Hardhat config
+sh deploy.sh V1 lisk-sepolia Melodyne
 ```
+to deploy the first version of `Melodyne` on `lisk-sepolia`.
+
+Note that the version number should include `V` followed by an integer. 
+
+---
+
+## 🧱 Interactions
+To test the interactions using the deployed version, there are scripts to perform all available actions. For example
+
+```
+NETWORK=lisk-sepolia npx hardhat run scripts/melodyneInteractions.js --network lisk-sepolia  
+```
+
+Remeber to pass the network value.
+
 
 ---
 
