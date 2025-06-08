@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract MelodyneConfig is Ownable {
+    string public constant VERSION = "1";
     // --- Core Business Logic ---
     uint256 public platformFeeBps;
     address public feeRecipient;

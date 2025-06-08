@@ -5,11 +5,7 @@
   "description": "The smart contract of Muzikie on Lisk L2",
   "author": "Ali Haghighatkhah <ali@muzikie.com>",
   "scripts": {
-    "deploy:melodyne:testnet": "npx hardhat ignition deploy ignition/modules/Melodyne.ts --network lisk-sepolia",
-    "deploy:melodyne:mainnet": "npx hardhat ignition deploy ignition/modules/Melodyne.ts --network lisk",
-    "deploy:usdc:testnet": "npx hardhat ignition deploy ignition/modules/MockUSDC.ts --network lisk-sepolia",
-    "deploy:config:testnet": "npx hardhat ignition deploy ignition/modules/MelodyneConfig.ts --network lisk-sepolia",
-    "deploy:config:mainnet": "npx hardhat ignition deploy ignition/modules/MelodyneConfig.ts --network lisk",
+    "deploy": "npx hardhat ignition deploy",
     "compile": "npx hardhat compile",
     "test": "npx hardhat test"
   },

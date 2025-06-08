@@ -1,16 +1,21 @@
 const { ethers } = require("hardhat");
 const { Wallet } = require("ethers");
+const deployments = require("../deployments.json");
+
+const NETWORK = process.env.NETWORK || "lisk";
+const MELODYNE_VERSION = process.env.MELODYNE_VERSION || "V1";
+const MELODYNE_ADDRESS = deployments[NETWORK][`Melodyne${MELODYNE_VERSION}`];
+
 
 // To test the interactions use
 // npx hardhat run scripts/melodyneInteractions.js --network lisk-sepolia
 async function main() {
   const campaignId = 0;
   const USDC_ADDRESS = "0x3ba742FD7502a6395D234e024A64c78705496dfE"; // Mock USDC
-  const MELODYNE_ADDRESS = "0x02d8a9d9d09c071C43CEBaa52C7Fa9b0cBD5f18D"; // Melodyne V11
   const donor1 = new Wallet("9e5f4c8fb95d93cde24a23d09a1d98b5f42b25ef191fa1fe157cd1edc13340d5", ethers.provider);
 
   const usdc = await ethers.getContractAt("MockUSDC", USDC_ADDRESS);
-  const melodyne = await ethers.getContractAt("MelodyneV11", MELODYNE_ADDRESS);
+  const melodyne = await ethers.getContractAt("Melodyne", MELODYNE_ADDRESS);
   const eth50 = ethers.utils.parseUnits("50", 6)
   const eth100 = ethers.utils.parseUnits("100", 6)
   const eth150 = ethers.utils.parseUnits("150", 6)

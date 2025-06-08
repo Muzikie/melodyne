@@ -1,10 +1,13 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+import deployments from "../../deployments.json";
 
-const MelodyneModule = buildModule("MelodyneV11", (m) => {
-  const usdcAddress = "0x3ba742FD7502a6395D234e024A64c78705496dfE";
-  const configAddress = "0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd";
+const NETWORK = process.env.NETWORK || "lisk";
+const MELODYNE_VERSION = process.env.MELODYNE_VERSION || "V1";
+const USDC_ADDRESS = deployments[NETWORK].MockUSDC;
+const CONFIG_ADDRESS = deployments[NETWORK].MelodyneConfig;
 
-  const melodyne = m.contract("MelodyneV11", [usdcAddress, configAddress]);
+const MelodyneModule = buildModule(`Melodyne_${MELODYNE_VERSION}`, (m) => {
+  const melodyne = m.contract("Melodyne", [USDC_ADDRESS, CONFIG_ADDRESS]);
 
   return { melodyne };
 });

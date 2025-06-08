@@ -4,7 +4,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IMelodyneConfig.sol";
 
-contract MelodyneV11 {
+contract Melodyne {
+    string public constant VERSION = "1";
     using SafeERC20 for IERC20;
     IERC20 public immutable usdc;
     IMelodyneConfig public immutable config;
