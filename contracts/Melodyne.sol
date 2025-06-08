@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IMelodyneConfig.sol";
 
 contract Melodyne {
-    string public constant VERSION = "15";
+    string public constant VERSION = "16";
     using SafeERC20 for IERC20;
     IERC20 public immutable usdc;
     IMelodyneConfig public immutable config;
