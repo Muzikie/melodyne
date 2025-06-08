@@ -99,7 +99,6 @@ jq --arg net "$NETWORK" \
    --arg addr "$DEPLOYED_ADDRESS" \
    --arg ver "V${VERSION_NUMBER}" '
   .[$net] = (.[$net] // {})
-    + { ("Melodyne" + $ver): $addr }
     + { "Melodyne": $addr }
 ' "$CONFIG_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$CONFIG_FILE"
 
