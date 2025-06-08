@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./interfaces/IMelodyneConfig.sol";
 
-contract MelodyneV3 {
+contract MelodyneV11 {
+    using SafeERC20 for IERC20;
     IERC20 public immutable usdc;
     IMelodyneConfig public immutable config;
     enum CampaignStatus { Draft, Published, Successful, Failed, SoldOut }
@@ -58,22 +60,34 @@ contract MelodyneV3 {
     function createCampaign(uint256 _goal, uint256 _hardCap, uint256 _deadline) external notPaused() {
         // Campaign rules
         require(_goal <= _hardCap, "Goal exceeds cap");
-        require(_deadline > block.timestamp, "Invalid deadline");
-        uint256 duration = _deadline - block.timestamp;
-        require(duration >= config.minCampaignDuration(), "Below min duration");
-        require(duration <= config.maxCampaignDuration(), "Above max duration");
-
-        // Platform-wide constraints
         require(activeCampaigns[msg.sender] < config.maxActiveCampaignsPerUser(), "Too many active");
+
+        // Lifetime restrictions
+        require(_deadline > block.timestamp, "Deadline in the past");
+        uint256 duration = _deadline - block.timestamp;
+        uint256 minDuration;
+        uint256 maxDuration;
+        try config.minCampaignDuration() returns (uint256 _min) {
+            minDuration = _min;
+        } catch {
+            revert("config.minCampaignDuration failed");
+        }
+        try config.maxCampaignDuration() returns (uint256 _max) {
+            maxDuration = _max;
+        } catch {
+            revert("config.minCampaignDuration failed");
+        }
+        require(duration >= minDuration, "Below min duration");
+        require(duration < maxDuration, "Above max duration");
 
         // Pay campaign creation fee
         uint256 creationFee = config.campaignCreationFee();
         if (creationFee > 0) {
             IERC20 feeToken = IERC20(config.campaignFeeToken());
-            require(feeToken.transferFrom(msg.sender, config.feeRecipient(), creationFee), "Fee payment failed");
+            feeToken.safeTransferFrom(msg.sender, config.feeRecipient(), creationFee);
         }
 
-
+        // Store campaign
         Campaign storage c = campaigns[campaignCount];
         c.owner = msg.sender;
         c.goal = _goal;

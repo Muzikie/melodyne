@@ -8,7 +8,7 @@ async function main() {
 
 
   /************  Deploy Config  **************/
-  // console.log("Deploying with:", deployer.address);
+  console.log("Deploying with:", deployer.address);
   // const MelodyneConfig = await ethers.getContractFactory("MelodyneConfig");
   // const config = await MelodyneConfig.deploy();
   // await config.wait();
@@ -44,7 +44,7 @@ async function main() {
 
 
   console.log("Set Campaign creation fee");
-  const eth1 = ethers.utils.parseUnits("1", 6)
+  const eth1 = ethers.utils.parseUnits("0", 6)
   const tx5 = await config.setCampaignCreationFee(eth1); // 1 USDC (6 decimals)
   await tx5.wait();
 
