@@ -61,35 +61,44 @@ EOF
 
 # === Compile contracts ===
 echo "🔨 Compiling contracts..."
-yarn compile
+yarn compile --force
 
 # === Deploy to network ===
 echo "🚀 Deploying $MODULE_NAME to network $NETWORK..."
 
-DEPLOY_OUTPUT=$(npx hardhat ignition deploy "$MODULE_FILE" --network "$NETWORK")
+DEPLOY_OUTPUT=$(yes | npx hardhat ignition deploy "$MODULE_FILE" --network "$NETWORK")
 
 echo "$DEPLOY_OUTPUT"
 
-DEPLOYED_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oP "$MODULE_NAME#${MODULE_NAME} - 0x[a-fA-F0-9]{40}" | awk '{print $3}')
+# ✅ Extract deployed address using POSIX grep
+DEPLOYED_ADDRESS=$(echo "$DEPLOY_OUTPUT" | grep -oE "${MODULE_NAME}#${CONTRACT_NAME} - 0x[a-fA-F0-9]{40}" | awk '{print $3}')
 
 if [ -z "$DEPLOYED_ADDRESS" ]; then
   echo "❌ Could not parse deployed address from deploy output!"
   exit 1
 fi
 
-echo "📬 Deployed $MODULE_NAME at $DEPLOYED_ADDRESS"
+echo "✅ Deployed $CONTRACT_NAME to $DEPLOYED_ADDRESS"
 
-# Update deploy-config.json
-TMP_CONFIG=$(mktemp)
-jq --arg net "$NETWORK" --arg addr "$DEPLOYED_ADDRESS" '.[$net].Melodyne = $addr' "$DEPLOY_CONFIG" > "$TMP_CONFIG" && mv "$TMP_CONFIG" "$DEPLOY_CONFIG"
+# ✅ Update deploy-config.json
+CONFIG_FILE="deploy-config.json"
+TMP_FILE=$(mktemp)
 
-echo "📝 Updated $DEPLOY_CONFIG with Melodyne address for $NETWORK"
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "{}" > "$CONFIG_FILE"
+fi
 
-# === Git commit, tag, and push ===
-echo "📁 Committing changes and tagging version..."
-git add "$MODULE_FILE"
-git commit -m "Deploy ${MODULE_NAME} to ${NETWORK}"
-git tag "$TAG_NAME"
-git push origin main --tags
+# Add or update the entry in JSON
+jq --arg net "$NETWORK" --arg ver "$VERSION" --arg addr "$DEPLOYED_ADDRESS" '
+  .[$net] = (.[$net] // {}) + { ("MelodyneV"+$ver): $addr }
+' "$CONFIG_FILE" > "$TMP_FILE" && mv "$TMP_FILE" "$CONFIG_FILE"
 
-echo "✅ Done! Tagged: $TAG_NAME"
+echo "✅ Updated $CONFIG_FILE"
+
+# ✅ Git commit and tag
+git add "$CONFIG_FILE" "contracts/$CONTRACT_NAME.sol" "ignition/modules/$MODULE_NAME.ts"
+git commit -m "Deploy $MODULE_NAME to $NETWORK: $DEPLOYED_ADDRESS"
+git tag "$MODULE_NAME-$NETWORK"
+git push origin HEAD --tags
+
+echo "✅ Done! Tagged: $MODULE_NAME-$NETWORK"
