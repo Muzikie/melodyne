@@ -52,30 +52,42 @@ yarn test
 
 ---
 
-## 📂 Project Structure
+## ✅ Deploy
+Use the `./deploy.sh` file to automatically deploy a new version of each contract. The bash script will
+ - Update all required files,
+ - Create new ignition module file,
+ - Compile the changed files
+ - Deploy the new version
+ - Commit, tag and push the changes.
+For example you can run:
+
 ```
-contracts/
-│   Melodyne.sol               # Main contract
-│   MockUSDC.sol               # Mock USDC to use on Sepolia
-ignition/modules/
-│   Melodyne.ts               # Deployment module
-│   MockUSDC.ts               # USDC token module
-test/
-│   usdcInteractions.ts       # TS scripts to interact with USDC for testing purposes
-test/
-│   Campaign.ts               # Tests for contract logic
-│   MockUSDC.test.ts          # Tests for USDC contract logic
-hardhat.config.ts             # Hardhat config
+sh deploy.sh V1 lisk-sepolia Melodyne
 ```
+to deploy the first version of `Melodyne` on `lisk-sepolia`.
+
+Note that the version number should include `V` followed by an integer. 
+
+---
+
+## 🧱 Interactions
+To test the interactions using the deployed version, there are scripts to perform all available actions. For example
+
+```
+NETWORK=lisk-sepolia npx hardhat run scripts/melodyneInteractions.js --network lisk-sepolia  
+```
+
+Remeber to pass the network value.
+
 
 ---
 
 ## 🧱 Addresses
 - Lisk Sepolia
   - Deployer Account: `0xEB32c9fc9c5553f698C95AC5bA218fD70843fD53`
-  - USDC: `0x3ba742FD7502a6395D234e024A64c78705496dfE`
-  - MelodyneV11: `0x02d8a9d9d09c071C43CEBaa52C7Fa9b0cBD5f18D`
-  - MelodyneConfig: `0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd`
+  - USDC: `0x3ba742FD7502a6395D234e024A64c78705496dfE`,
+  - MelodyneConfig: `0x16cfDd7598cc34F3d392571A3a0c66C9E1BCB6Cd`,
+  - Melodyne: `0x04028B70b21D30739922f6829FdDae61698aC78b`,
 - Lisk Mainnet
   - Melodyne: ``
 
