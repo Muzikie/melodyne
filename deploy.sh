@@ -97,8 +97,8 @@ echo "✅ Updated $CONFIG_FILE"
 
 # ✅ Git commit and tag
 git add "$CONFIG_FILE" "contracts/$CONTRACT_NAME.sol" "ignition/modules/$MODULE_NAME.ts"
-git commit -m "Deploy $MODULE_NAME to $NETWORK: $DEPLOYED_ADDRESS"
-git tag "$MODULE_NAME-$NETWORK"
+git commit -m "ci:deploy $MODULE_NAME to $NETWORK: $DEPLOYED_ADDRESS"
+git tag "$MODULE_NAME-$NETWORK-$VERSION"
 git push origin HEAD --tags
 
 echo "✅ Done! Tagged: $MODULE_NAME-$NETWORK"
