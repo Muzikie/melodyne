@@ -4,25 +4,36 @@ const { Wallet } = require("ethers");
 // To test the interactions use
 // npx hardhat run scripts/melodyneInteractions.js --network lisk-sepolia
 async function main() {
-  const campaignId = 1;
+  const campaignId = 0;
   const USDC_ADDRESS = "0x3ba742FD7502a6395D234e024A64c78705496dfE"; // Mock USDC
-  const MELODYNE_ADDRESS = "0xf915887e441AA771f88d454A1C0A063cC1D2B01C"; // Melodyne
+  const MELODYNE_ADDRESS = "0x02d8a9d9d09c071C43CEBaa52C7Fa9b0cBD5f18D"; // Melodyne V11
   const donor1 = new Wallet("9e5f4c8fb95d93cde24a23d09a1d98b5f42b25ef191fa1fe157cd1edc13340d5", ethers.provider);
 
   const usdc = await ethers.getContractAt("MockUSDC", USDC_ADDRESS);
-  const melodyne = await ethers.getContractAt("MelodyneV3", MELODYNE_ADDRESS);
+  const melodyne = await ethers.getContractAt("MelodyneV11", MELODYNE_ADDRESS);
   const eth50 = ethers.utils.parseUnits("50", 6)
   const eth100 = ethers.utils.parseUnits("100", 6)
   const eth150 = ethers.utils.parseUnits("150", 6)
 
   const goal = eth100;
   const cap = eth150;
-  const deadline = (await ethers.provider.getBlock("latest")).timestamp + 360;
+  const now = (await ethers.provider.getBlock("latest")).timestamp;
+  const deadline = now + 4600;
+
+
+  /************  Approving Spending  ************/
+  console.log("Approving Melodyne contract...");
+  const approveTx = await usdc.connect(donor1).approve(melodyne.address, cap);
+  await approveTx.wait();
+  console.log("USDC Balance:", (await usdc.balanceOf(donor1.address)).toString());
+  console.log("Allowance:", (await usdc.allowance(donor1.address, melodyne.address)).toString());
 
 
   /********  Creating Campaign  ***********/
   console.log("Creating campaign...");
-  const txCampaign = await melodyne.createCampaign(goal, cap, deadline);
+  const txCampaign = await melodyne.createCampaign(goal, cap, deadline, {
+    gasLimit: 1_000_000
+  });
   await txCampaign.wait();
 
 
@@ -41,23 +52,6 @@ async function main() {
   await txPublish.wait();
 
 
-
-  /************  Minting USDC  ************/
-  console.log("Minting USDC to donor...");
-  const mintTx = await usdc.mint(donor1.address, eth100);
-  await mintTx.wait();
-
-
-
-  /************  Approving Spending  ************/
-  console.log("Approving Melodyne contract...");
-  const approveTx = await usdc.connect(donor1).approve(melodyne.address, cap);
-  await approveTx.wait();
-  console.log("Allowance:", (await usdc.allowance(donor1.address, melodyne.address)).toString());
-  console.log("USDC Balance:", (await usdc.balanceOf(donor1.address)).toString());
-
-
-
   /************  Contributing   ************/
   console.log("Contributing to campaign 1 ...");
   const contributeTx1 = await melodyne.connect(donor1).contribute(campaignId, 0, {
@@ -74,7 +68,7 @@ async function main() {
 
 
   /************  Get Campaign   ************/
-  let campaign = await melodyne.getCampaign(campaignId);
+  campaign = await melodyne.getCampaign(campaignId);
   console.log("Total contributed:", ethers.utils.formatUnits(campaign.totalContributed, 6));
   console.log("Current status:", campaign.status);
 

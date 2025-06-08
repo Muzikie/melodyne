@@ -25,7 +25,7 @@ describe('Melodyne Fundraiser', function () {
     await config.setCampaignCreationFee(0);
     await config.setCampaignFeeToken(usdc.address); // Use USDC for simplicity
 
-    const Melodyne = await ethers.getContractFactory('MelodyneV3');
+    const Melodyne = await ethers.getContractFactory('MelodyneV11');
     melodyne = await Melodyne.deploy(usdc.address, config.address);
     await melodyne.deployed();
 
@@ -65,7 +65,7 @@ describe('Melodyne Fundraiser', function () {
       try {
         await melodyne.connect(owner).createCampaign(goal, cap, deadline);
       } catch (e) {
-        expect(e.message).to.include('Invalid deadline');
+        expect(e.message).to.include('Deadline in the past');
       }
     });
 
