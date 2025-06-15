@@ -2,7 +2,7 @@
   "lisk": {
     "USDC": "0xF242275d3a6527d877f2c927a82D9b057609cc71",
     "MelodyneConfig": "0x6DB9c8f51D1a6494acB60D7e84870aeE4baa6d69",
-    "Melodyne": ""
+    "Melodyne": "0x5c4EfD5C0dD205067eCEeE0dDea025b08535052F"
   },
   "lisk-sepolia": {
     "USDC": "0x3ba742FD7502a6395D234e024A64c78705496dfE",
